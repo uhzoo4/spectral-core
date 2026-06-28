@@ -20,6 +20,7 @@ export const NullStateShader = {
     uniform vec2 uMouse;
     uniform vec4 uThreats[4];
     
+    varying vec2 vUv;
     varying vec3 vWorldPosition;
     varying vec3 vColor;
     varying float vDensity;
@@ -33,6 +34,7 @@ export const NullStateShader = {
     }
 
     void main() {
+      vUv = uv;
       vColor = color;
       
       vec4 instancePosition = instanceMatrix * vec4(0.0, 0.0, 0.0, 1.0);
@@ -88,6 +90,7 @@ export const NullStateShader = {
     uniform vec4 uSignals[8];
     uniform vec4 uThreats[4];
     
+    varying vec2 vUv;
     varying vec3 vWorldPosition;
     varying vec3 vColor;
     varying float vDensity;
@@ -137,7 +140,7 @@ export const NullStateShader = {
       }
 
       // 4. Node circular alpha profile
-      float centerGlow = 1.0 - length(gl_PointCoord - vec2(0.5)) * 2.0;
+      float centerGlow = 1.0 - length(vUv - vec2(0.5)) * 2.0;
       centerGlow = clamp(centerGlow, 0.0, 1.0);
       
       gl_FragColor = vec4(finalColor, centerGlow * uNodeOpacity * vDensity * focusDim);
