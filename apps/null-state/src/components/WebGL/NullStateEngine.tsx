@@ -5,59 +5,125 @@ import * as THREE from 'three';
 import { useHardwareTier } from '../../hooks/useHardwareTier';
 import { NullStateShader } from '../../shaders/NullStateShader';
 import { liveValues } from '../../stores/liveValues';
-import { networkState, discoveryState, emotionState, cinematicState } from '@cinematic-engine/core';
+import { 
+  engine, 
+  networkState, 
+  discoveryState, 
+  emotionState, 
+  cinematicState 
+} from '@cinematic-engine/core';
+import {
+  TimeSystem,
+  InteractionSystem,
+  ClusterSystem,
+  SignalPropagationSystem,
+  ObserverSystem,
+  ThreatSystem,
+  DiscoverySystem,
+  NarrativeSystem,
+  RevealSystem,
+  EmotionSystem,
+  VisualLanguageSystem,
+  TimelineDirector,
+  PacingSystem,
+  FocusSystem,
+  InteractionLanguageSystem,
+  MagneticFieldSystem,
+  FocusAttentionSystem,
+  InteractionTimelineSystem,
+  NodeFieldSystem
+} from '@cinematic-engine/systems';
 
 // 1. Controller component to handle high-frequency frame ticks inside the Canvas context
 const SceneController = ({ instanceCount }: { instanceCount: number }) => {
   const meshRef = useRef<THREE.InstancedMesh>(null);
   const materialRef = useRef<THREE.ShaderMaterial>(null);
-  const { useFrame: r3fUseFrame } = useThree();
+  const nodeFieldSystemRef = useRef<NodeFieldSystem | null>(null);
 
-  // Create shared temp structures to avoid heap allocations during frame ticks
-  const tempObject = useMemo(() => new THREE.Object3D(), []);
+  // Pre-allocated temp structures to avoid heap allocations in frame loops
+  const tempMatrix = useMemo(() => new THREE.Matrix4(), []);
   const tempColor = useMemo(() => new THREE.Color(), []);
 
-  // Initialize node matrices and indices once on mount
+  // Initialize systems and link them with the engine
   useEffect(() => {
-    if (!meshRef.current) return;
+    const timeSystem = new TimeSystem();
+    const interactionSystem = new InteractionSystem();
+    const clusterSystem = new ClusterSystem();
+    const signalSystem = new SignalPropagationSystem();
+    const observerSystem = new ObserverSystem();
+    const threatSystem = new ThreatSystem();
+    const discoverySystem = new DiscoverySystem();
+    const narrativeSystem = new NarrativeSystem();
+    const revealSystem = new RevealSystem();
+    const emotionSystem = new EmotionSystem();
+    const visualLanguageSystem = new VisualLanguageSystem();
+    const timelineDirector = new TimelineDirector();
+    const pacingSystem = new PacingSystem();
+    const focusSystem = new FocusSystem();
+    const interactionLanguageSystem = new InteractionLanguageSystem();
+    const magneticSystem = new MagneticFieldSystem();
+    const focusAttentionSystem = new FocusAttentionSystem();
+    const interactionTimelineSystem = new InteractionTimelineSystem();
+    
+    const nodeFieldSystem = new NodeFieldSystem(instanceCount);
+    nodeFieldSystemRef.current = nodeFieldSystem;
 
-    const mesh = meshRef.current;
-    mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+    engine.registerSystem(timeSystem);
+    engine.registerSystem(interactionSystem);
+    engine.registerSystem(clusterSystem);
+    engine.registerSystem(signalSystem);
+    engine.registerSystem(observerSystem);
+    engine.registerSystem(threatSystem);
+    engine.registerSystem(discoverySystem);
+    engine.registerSystem(narrativeSystem);
+    engine.registerSystem(revealSystem);
+    engine.registerSystem(emotionSystem);
+    engine.registerSystem(visualLanguageSystem);
+    engine.registerSystem(timelineDirector);
+    engine.registerSystem(pacingSystem);
+    engine.registerSystem(focusSystem);
+    engine.registerSystem(interactionLanguageSystem);
+    engine.registerSystem(magneticSystem);
+    engine.registerSystem(focusAttentionSystem);
+    engine.registerSystem(interactionTimelineSystem);
+    engine.registerSystem(nodeFieldSystem);
 
-    // Seed repeatable pseudorandom nodes
-    for (let i = 0; i < instanceCount; i++) {
-      const theta = Math.random() * Math.PI * 2;
-      const phi = Math.acos(Math.random() * 2 - 1);
-      const r = 5.0 + Math.random() * 8.0;
+    // Initial node configurations
+    if (meshRef.current) {
+      const mesh = meshRef.current;
+      mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+      
+      const obj = new THREE.Object3D();
+      for (let i = 0; i < instanceCount; i++) {
+        const px = nodeFieldSystem.positions[i * 3 + 0];
+        const py = nodeFieldSystem.positions[i * 3 + 1];
+        const pz = nodeFieldSystem.positions[i * 3 + 2];
+        
+        obj.position.set(px, py, pz);
+        obj.scale.setScalar(0.08 + Math.random() * 0.12);
+        obj.updateMatrix();
+        mesh.setMatrixAt(i, obj.matrix);
 
-      // Distribute nodes in a premium atmospheric cluster shell
-      const x = r * Math.sin(phi) * Math.cos(theta);
-      const y = r * Math.sin(phi) * Math.sin(theta);
-      const z = r * Math.cos(phi) * 0.5;
-
-      tempObject.position.set(x, y, z);
-      tempObject.scale.setScalar(0.08 + Math.random() * 0.12);
-      tempObject.updateMatrix();
-
-      mesh.setMatrixAt(i, tempObject.matrix);
-
-      // Distribute baseline colors (Cyan/Teal theme)
-      tempColor.setRGB(0.0, 0.8 + Math.random() * 0.2, 0.6 + Math.random() * 0.4);
-      mesh.setColorAt(i, tempColor);
+        tempColor.setRGB(0.0, 0.8 + Math.random() * 0.2, 0.6 + Math.random() * 0.4);
+        mesh.setColorAt(i, tempColor);
+      }
+      mesh.instanceMatrix.needsUpdate = true;
+      if (mesh.instanceColor) {
+        mesh.instanceColor.needsUpdate = true;
+      }
     }
 
-    mesh.instanceMatrix.needsUpdate = true;
-    if (mesh.instanceColor) {
-      mesh.instanceColor.needsUpdate = true;
-    }
-  }, [instanceCount, tempObject, tempColor]);
+    return () => {
+      engine.dispose();
+      nodeFieldSystemRef.current = null;
+    };
+  }, [instanceCount, tempColor]);
 
-  // Tight frame updates loop
+  // Tight frame loop
   useFrame((state, delta) => {
     const time = state.clock.getElapsedTime();
     liveValues.time = time;
 
-    // Convert mouse NDC to scaled projection bounds
     const viewportWidth = state.viewport.width;
     const viewportHeight = state.viewport.height;
 
@@ -71,14 +137,33 @@ const SceneController = ({ instanceCount }: { instanceCount: number }) => {
     liveValues.mouseX = networkState.pointerPos.x;
     liveValues.mouseY = networkState.pointerPos.y;
 
-    // Update material uniforms directly (0 allocations)
+    // 1. Run engine systems update ticks (updates all positions and opacities)
+    engine.update(time, delta);
+
+    // 2. Direct matrix elements mutation (0 heap allocations)
+    const nodeFieldSystem = nodeFieldSystemRef.current;
+    if (meshRef.current && nodeFieldSystem) {
+      const mesh = meshRef.current;
+      for (let i = 0; i < instanceCount; i++) {
+        mesh.getMatrixAt(i, tempMatrix);
+        
+        // Mutate translation coordinates in-place
+        tempMatrix.elements[12] = nodeFieldSystem.positions[i * 3 + 0];
+        tempMatrix.elements[13] = nodeFieldSystem.positions[i * 3 + 1];
+        tempMatrix.elements[14] = nodeFieldSystem.positions[i * 3 + 2];
+        
+        mesh.setMatrixAt(i, tempMatrix);
+      }
+      mesh.instanceMatrix.needsUpdate = true;
+    }
+
+    // 3. Update shader material uniforms
     if (materialRef.current) {
       const mat = materialRef.current;
       mat.uniforms.uTime.value = time;
       mat.uniforms.uMouse.value[0] = liveValues.mouseX;
       mat.uniforms.uMouse.value[1] = liveValues.mouseY;
 
-      // Sync color profiles from emotionState
       mat.uniforms.uPrimaryColor.value.setRGB(
         emotionState.primaryColor.r,
         emotionState.primaryColor.g,
@@ -90,22 +175,19 @@ const SceneController = ({ instanceCount }: { instanceCount: number }) => {
         emotionState.glowColor.b
       );
 
-      // Sync opacity triggers from discoveryState
       mat.uniforms.uNodeOpacity.value = discoveryState.nodeOpacity;
       mat.uniforms.uSignalOpacity.value = discoveryState.signalOpacity;
       mat.uniforms.uThreatOpacity.value = discoveryState.threatOpacity;
 
-      // Sync focus dimensions from cinematicState
       mat.uniforms.uFocusPosition.value.copy(cinematicState.focusPosition);
       mat.uniforms.uFocusRadius.value = cinematicState.focusRadius;
 
-      // Sync active uniform arrays
       mat.uniforms.uSignals.value = networkState.signals;
       mat.uniforms.uThreats.value = networkState.threats;
     }
   });
 
-  // Safe manual disposal of meshes
+  // Manual GPU resource cleanup
   useEffect(() => {
     return () => {
       if (meshRef.current) {
@@ -139,7 +221,6 @@ const SceneController = ({ instanceCount }: { instanceCount: number }) => {
   );
 };
 
-// 2. SVG Fallback component for low-tier hardware configurations
 const SVGFallback = () => {
   return (
     <div className="absolute inset-0 bg-[#07090b] flex items-center justify-center pointer-events-none select-none">
@@ -151,7 +232,6 @@ const SVGFallback = () => {
           </radialGradient>
         </defs>
         <circle cx="50%" cy="50%" r="40%" fill="url(#grad)" />
-        {/* Render a grid matrix of clean vector points */}
         {Array.from({ length: 40 }).map((_, i) => {
           const x = 10 + (i % 8) * 12 + Math.sin(i) * 2;
           const y = 10 + Math.floor(i / 8) * 18 + Math.cos(i) * 2;
@@ -172,7 +252,6 @@ const SVGFallback = () => {
   );
 };
 
-// 3. Main wrapper orchestrating hardware profile selections
 export default function NullStateEngine() {
   const hardwareTier = useHardwareTier();
 
