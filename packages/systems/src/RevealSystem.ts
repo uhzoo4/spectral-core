@@ -1,10 +1,10 @@
 import { discoveryState } from '@cinematic-engine/core';
-import { discoveryConfig } from '../../apps/null-state/src/config/discovery';
+import { discoveryConfig } from '../../../apps/null-state/src/config/discovery';
 
 export class RevealSystem {
   public name = 'RevealSystem';
 
-  public update(time: number, delta: number): void {
+  public update(_time: number, _delta: number): void {
     const curIdx = discoveryState.currentState;
     const tgtIdx = discoveryState.targetState;
     const progress = discoveryState.transitionProgress;

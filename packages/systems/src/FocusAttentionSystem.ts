@@ -3,7 +3,7 @@ import { discoveryState, interactionState, cinematicState } from '@cinematic-eng
 export class FocusAttentionSystem {
   public name = 'FocusAttentionSystem';
 
-  public update(time: number, delta: number): void {
+  public update(_time: number, _delta: number): void {
     // Scale active focal boundaries based on interactive amplification factors
     const amp = interactionState.focalAmplification;
     cinematicState.focusRadius *= amp;

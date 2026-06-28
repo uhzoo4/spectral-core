@@ -2,7 +2,7 @@ export class TimeSystem {
   public name = 'TimeSystem';
   public elapsed = 0;
 
-  public update(time: number, delta: number): void {
+  public update(time: number, _delta: number): void {
     this.elapsed = time;
   }
 }

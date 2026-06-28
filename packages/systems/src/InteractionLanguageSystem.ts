@@ -1,6 +1,6 @@
 import { interactionState, EventBus, networkState } from '@cinematic-engine/core';
-import { interactionPresets, InteractionStage } from '../../apps/null-state/src/interaction/InteractionPresets';
-import { interactionLanguageConfig } from '../../apps/null-state/src/config/interactionLanguage';
+import { interactionPresets, InteractionStage } from '../../../apps/null-state/src/interaction/InteractionPresets';
+import { interactionLanguageConfig } from '../../../apps/null-state/src/config/interactionLanguage';
 
 export class InteractionLanguageSystem {
   public name = 'InteractionLanguageSystem';
@@ -23,7 +23,7 @@ export class InteractionLanguageSystem {
     }
   }
 
-  public update(time: number, delta: number): void {
+  public update(_time: number, delta: number): void {
     const hasPointer = networkState.pointerActive;
     const ptrSpeed = networkState.pointerSpeed;
     const current = interactionState.targetStage;

@@ -1,5 +1,5 @@
 import { discoveryState, cinematicState, EventBus } from '@cinematic-engine/core';
-import { cinematicConfig } from '../../apps/null-state/src/config/cinematicDirection';
+import { cinematicConfig } from '../../../apps/null-state/src/config/cinematicDirection';
 
 export class TimelineDirector {
   public name = 'TimelineDirector';

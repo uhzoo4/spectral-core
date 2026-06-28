@@ -1,5 +1,5 @@
-import React, { useRef, useEffect, useMemo } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { useRef, useEffect, useMemo } from 'react';
+import { Canvas, useFrame } from '@react-three/fiber';
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
 import * as THREE from 'three';
 import { useHardwareTier } from '../../hooks/useHardwareTier';

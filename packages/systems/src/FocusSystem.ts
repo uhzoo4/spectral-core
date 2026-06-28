@@ -1,12 +1,12 @@
 import { Vector3 } from 'three';
 import { cinematicState, networkState } from '@cinematic-engine/core';
-import { cinematicConfig } from '../../apps/null-state/src/config/cinematicDirection';
+import { cinematicConfig } from '../../../apps/null-state/src/config/cinematicDirection';
 
 export class FocusSystem {
   public name = 'FocusSystem';
   private targetPosition = new Vector3(0, 0, 0);
 
-  public update(time: number, delta: number): void {
+  public update(_time: number, delta: number): void {
     const actIdx = cinematicState.currentActIndex;
     const cfg = cinematicConfig[actIdx];
 

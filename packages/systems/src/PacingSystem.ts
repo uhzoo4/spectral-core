@@ -1,5 +1,5 @@
 import { cinematicState } from '@cinematic-engine/core';
-import { cinematicConfig } from '../../apps/null-state/src/config/cinematicDirection';
+import { cinematicConfig } from '../../../apps/null-state/src/config/cinematicDirection';
 
 export class PacingSystem {
   public name = 'PacingSystem';

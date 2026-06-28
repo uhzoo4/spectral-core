@@ -39,7 +39,7 @@ export class ClusterSystem {
     }
   }
 
-  public update(time: number, delta: number): void {
+  public update(time: number, _delta: number): void {
     const count = this.config.count;
     const speed = this.config.driftSpeed;
     const freq = this.config.wanderFrequency;

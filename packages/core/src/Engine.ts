@@ -1,14 +1,22 @@
-import { EventBus } from './EventBus';
+import { MatrixPool, VectorPool } from '@cinematic-engine/memory';
 
-export interface System {
+export interface ISystem {
   name: string;
   update(time: number, delta: number): void;
   dispose?(): void;
 }
 
 export class Engine {
-  private systems: System[] = [];
+  private systems: ISystem[] = [];
   private static instance: Engine | null = null;
+  
+  public matrixPool: MatrixPool;
+  public vectorPool: VectorPool;
+
+  constructor() {
+    this.matrixPool = new MatrixPool(128);
+    this.vectorPool = new VectorPool(256);
+  }
 
   public static getInstance(): Engine {
     if (!this.instance) {
@@ -17,8 +25,7 @@ export class Engine {
     return this.instance;
   }
 
-  public registerSystem(system: System): void {
-    // Prevent duplicate registrations and listeners loop bugs
+  public registerSystem(system: ISystem): void {
     const existingIdx = this.systems.findIndex((s) => s.name === system.name);
     if (existingIdx !== -1) {
       const old = this.systems[existingIdx];
@@ -47,6 +54,10 @@ export class Engine {
     for (let i = 0; i < len; i++) {
       this.systems[i].update(time, delta);
     }
+    
+    // Automatically recycle scratch vectors/matrices at the end of the frame tick
+    this.matrixPool.releaseAll();
+    this.vectorPool.releaseAll();
   }
 
   public dispose(): void {
@@ -57,6 +68,8 @@ export class Engine {
       }
     }
     this.systems = [];
+    this.matrixPool.releaseAll();
+    this.vectorPool.releaseAll();
   }
 }
 

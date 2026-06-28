@@ -1,10 +1,13 @@
-import React from 'react';
 import NullStateEngine from './components/WebGL/NullStateEngine';
 import HeroSection from './components/HeroSection';
 
 export default function App() {
   return (
-    <div className="relative w-full min-h-screen bg-[#030507] overflow-hidden select-none">
+    <div style={{ width: '100%', height: '100%', position: 'relative' }}>
+      {/* Scanline CRT glass filters */}
+      <div className="ambient-overlay" />
+      <div className="terminal-scanlines" />
+
       {/* Background WebGL Instancing Engine */}
       <NullStateEngine />
 

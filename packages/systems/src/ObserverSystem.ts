@@ -19,7 +19,7 @@ export class ObserverSystem {
     };
   }
 
-  public update(time: number, delta: number): void {
+  public update(_time: number, delta: number): void {
     if (!networkState.pointerActive) {
       networkState.pointerSpeed = 0;
       return;

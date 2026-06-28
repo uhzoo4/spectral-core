@@ -9,7 +9,7 @@ export class VisualLanguageSystem {
   private lastG = -1;
   private lastB = -1;
 
-  public update(time: number, delta: number): void {
+  public update(_time: number, _delta: number): void {
     if (typeof document === 'undefined') return;
     
     const hud = document.getElementById('narrative-telemetry-hud');

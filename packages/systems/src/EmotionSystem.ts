@@ -1,5 +1,5 @@
-import { discoveryState, emotionState, EventBus } from '@cinematic-engine/core';
-import { emotionConfig } from '../../apps/null-state/src/config/emotion';
+import { emotionState, EventBus } from '@cinematic-engine/core';
+import { emotionConfig } from '../../../apps/null-state/src/config/emotion';
 
 export class EmotionSystem {
   public name = 'EmotionSystem';
@@ -22,7 +22,7 @@ export class EmotionSystem {
     }
   }
 
-  public update(time: number, delta: number): void {
+  public update(_time: number, delta: number): void {
     // 1. Advance transition
     if (emotionState.transitionProgress < 1.0) {
       const tgtCfg = emotionConfig[emotionState.targetEmotion];

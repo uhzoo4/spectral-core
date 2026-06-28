@@ -1,11 +1,11 @@
 import { discoveryState, interactionState } from '@cinematic-engine/core';
-import { interactionLanguageConfig } from '../../apps/null-state/src/config/interactionLanguage';
+import { interactionLanguageConfig } from '../../../apps/null-state/src/config/interactionLanguage';
 
 export class InteractionTimelineSystem {
   public name = 'InteractionTimelineSystem';
   private lastScrollOffset = 0;
 
-  public update(time: number, delta: number): void {
+  public update(_time: number, delta: number): void {
     if (delta <= 0) return;
 
     // 1. Calculate active scroll velocity

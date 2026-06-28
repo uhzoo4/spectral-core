@@ -1,10 +1,10 @@
 import { networkState, interactionState } from '@cinematic-engine/core';
-import { interactionLanguageConfig } from '../../apps/null-state/src/config/interactionLanguage';
+import { interactionLanguageConfig } from '../../../apps/null-state/src/config/interactionLanguage';
 
 export class MagneticFieldSystem {
   public name = 'MagneticFieldSystem';
 
-  public update(time: number, delta: number): void {
+  public update(_time: number, delta: number): void {
     if (!networkState.pointerActive) {
       interactionState.hoverIntensity = 0.0;
       return;

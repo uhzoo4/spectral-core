@@ -21,7 +21,7 @@ export class SignalPropagationSystem {
     };
   }
 
-  public update(time: number, delta: number): void {
+  public update(_time: number, delta: number): void {
     // 1. Progress and update active signals
     for (let i = 0; i < MAX_SIGNALS; i++) {
       if (networkState.signalActive[i]) {

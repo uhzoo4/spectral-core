@@ -1,5 +1,5 @@
 import { EventBus } from '@cinematic-engine/core';
-import { discoveryConfig } from '../../apps/null-state/src/config/discovery';
+import { discoveryConfig } from '../../../apps/null-state/src/config/discovery';
 
 export class NarrativeSystem {
   public name = 'NarrativeSystem';
@@ -87,7 +87,7 @@ export class NarrativeSystem {
     EventBus.emit('NARRATIVE_TYPING_START');
   }
 
-  public update(time: number, delta: number): void {
+  public update(_time: number, delta: number): void {
     if (!this.container || this.currentLogs.length === 0) return;
 
     this.typingTimer += delta;
