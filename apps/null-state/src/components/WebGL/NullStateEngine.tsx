@@ -2,16 +2,16 @@ import React, { useRef, useEffect, useMemo } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
 import * as THREE from 'three';
-import { useHardwareTier, HardwareTier } from '../../hooks/useHardwareTier';
+import { useHardwareTier } from '../../hooks/useHardwareTier';
 import { NullStateShader } from '../../shaders/NullStateShader';
 import { liveValues } from '../../stores/liveValues';
-import { networkState, discoveryState, emotionState } from '@cinematic-engine/core';
+import { networkState, discoveryState, emotionState, cinematicState } from '@cinematic-engine/core';
 
 // 1. Controller component to handle high-frequency frame ticks inside the Canvas context
 const SceneController = ({ instanceCount }: { instanceCount: number }) => {
   const meshRef = useRef<THREE.InstancedMesh>(null);
   const materialRef = useRef<THREE.ShaderMaterial>(null);
-  const { size, camera } = useThree();
+  const { useFrame: r3fUseFrame } = useThree();
 
   // Create shared temp structures to avoid heap allocations during frame ticks
   const tempObject = useMemo(() => new THREE.Object3D(), []);
@@ -94,6 +94,10 @@ const SceneController = ({ instanceCount }: { instanceCount: number }) => {
       mat.uniforms.uNodeOpacity.value = discoveryState.nodeOpacity;
       mat.uniforms.uSignalOpacity.value = discoveryState.signalOpacity;
       mat.uniforms.uThreatOpacity.value = discoveryState.threatOpacity;
+
+      // Sync focus dimensions from cinematicState
+      mat.uniforms.uFocusPosition.value.copy(cinematicState.focusPosition);
+      mat.uniforms.uFocusRadius.value = cinematicState.focusRadius;
 
       // Sync active uniform arrays
       mat.uniforms.uSignals.value = networkState.signals;
@@ -184,7 +188,7 @@ export default function NullStateEngine() {
       <Canvas
         camera={{ position: [0, 0, 20], fov: 60, near: 0.1, far: 100 }}
         gl={{
-          antialias: false, // Turn off for speed on integrated chips
+          antialias: false,
           powerPreference: 'high-performance',
           depth: false,
         }}

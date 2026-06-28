@@ -1,4 +1,4 @@
-import { Color, Vector4 } from 'three';
+import { Color, Vector3, Vector4 } from 'three';
 
 export const NullStateShader = {
   uniforms: {
@@ -9,6 +9,8 @@ export const NullStateShader = {
     uNodeOpacity: { value: 1.0 },
     uSignalOpacity: { value: 1.0 },
     uThreatOpacity: { value: 1.0 },
+    uFocusPosition: { value: new Vector3(0, 0, 0) },
+    uFocusRadius: { value: 4.0 },
     uSignals: { value: Array.from({ length: 8 }, () => new Vector4(0, 0, 0, 0)) },
     uThreats: { value: Array.from({ length: 4 }, () => new Vector4(0, 0, 0, 0)) },
   },
@@ -33,24 +35,22 @@ export const NullStateShader = {
     void main() {
       vColor = color;
       
-      // Calculate active world coordinates of this instance
       vec4 instancePosition = instanceMatrix * vec4(0.0, 0.0, 0.0, 1.0);
       
-      // Apply procedural organic drift offset
       float offsetTime = uTime * 0.35 + instancePosition.x * 0.02 + instancePosition.y * 0.02;
       vec3 drift = lissajous(offsetTime, 0.4);
       
       vec3 localPosition = position * (1.0 + sin(uTime * 0.8 + instancePosition.z) * 0.08);
       vec4 modelPosition = instanceMatrix * vec4(localPosition + drift * 0.9, 1.0);
 
-      // Mouse/Pointer displacement check
+      // Pointer interactive coordinates pull
       float distToMouse = distance(modelPosition.xy, uMouse);
       if (distToMouse < 6.0) {
         float pullStrength = (1.0 - distToMouse / 6.0) * 0.35;
         modelPosition.xy += (uMouse - modelPosition.xy) * pullStrength;
       }
 
-      // Threat anomalies vertex displacements
+      // Threat anomalies tremors
       float glitchFactor = 0.0;
       for (int i = 0; i < 4; i++) {
         if (uThreats[i].w > 0.0) {
@@ -82,6 +82,9 @@ export const NullStateShader = {
     uniform float uSignalOpacity;
     uniform float uThreatOpacity;
     
+    uniform vec3 uFocusPosition;
+    uniform float uFocusRadius;
+    
     uniform vec4 uSignals[8];
     uniform vec4 uThreats[4];
     
@@ -90,10 +93,9 @@ export const NullStateShader = {
     varying float vDensity;
 
     void main() {
-      // 1. Blend background graphite with emotional theme colors
       vec3 finalColor = mix(uGlowColor, uPrimaryColor, vDensity);
 
-      // 2. Pulse signals wavefront animation
+      // 1. Signal pulse wavefront
       float signalGlow = 0.0;
       for (int i = 0; i < 8; i++) {
         if (uSignals[i].w > 0.0) {
@@ -108,7 +110,7 @@ export const NullStateShader = {
       
       finalColor = mix(finalColor, vColor, signalGlow * 0.9 * uSignalOpacity);
 
-      // 3. Threat anomalies color shifts
+      // 2. Threat glitched centers
       float threatFactor = 0.0;
       for (int i = 0; i < 4; i++) {
         if (uThreats[i].w > 0.0) {
@@ -121,16 +123,24 @@ export const NullStateShader = {
       }
       
       if (threatFactor > 0.0) {
-        vec3 threatColor = vec3(0.9, 0.45, 0.0); // Amber
-        threatColor = mix(threatColor, vec3(0.8, 0.05, 0.12), threatFactor); // Crimson mix
+        vec3 threatColor = vec3(0.9, 0.45, 0.0);
+        threatColor = mix(threatColor, vec3(0.8, 0.05, 0.12), threatFactor);
         finalColor = mix(finalColor, threatColor, threatFactor * uThreatOpacity);
       }
 
-      // 4. Circular point alpha mask
+      // 3. Proximity-based focus dimming (direct GPU calculations)
+      float focusDim = 1.0;
+      float distToFocus = distance(vWorldPosition.xyz, uFocusPosition);
+      if (distToFocus > uFocusRadius) {
+        float falloff = (distToFocus - uFocusRadius) / 5.0; // 5.0 unit smooth fade
+        focusDim = mix(1.0, 0.08, clamp(falloff, 0.0, 1.0)); // Dim out-of-focus instances to 8%
+      }
+
+      // 4. Node circular alpha profile
       float centerGlow = 1.0 - length(gl_PointCoord - vec2(0.5)) * 2.0;
       centerGlow = clamp(centerGlow, 0.0, 1.0);
       
-      gl_FragColor = vec4(finalColor, centerGlow * uNodeOpacity * vDensity);
+      gl_FragColor = vec4(finalColor, centerGlow * uNodeOpacity * vDensity * focusDim);
     }
   `
 };

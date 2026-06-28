@@ -11,6 +11,7 @@ export class NarrativeSystem {
   private typingTimer = 0.0;
   private charDelay = 0.035; // Typewriter speed (seconds per character)
   private lineDelay = 1.2; // Pause between log lines
+  private isCurrentlyTyping = false;
 
   constructor() {
     this.createHUDElement();
@@ -40,7 +41,6 @@ export class NarrativeSystem {
       hud.style.letterSpacing = '1px';
       hud.style.transition = 'color 0.5s ease';
 
-      // Insert blinking cursor CSS animation to head if not present
       if (!document.getElementById('hud-blink-style')) {
         const style = document.createElement('style');
         style.id = 'hud-blink-style';
@@ -81,6 +81,10 @@ export class NarrativeSystem {
     this.charIndex = 0;
     this.currentText = '';
     this.typingTimer = 0.0;
+    
+    // Trigger typing state and dispatch lock signal
+    this.isCurrentlyTyping = true;
+    EventBus.emit('NARRATIVE_TYPING_START');
   }
 
   public update(time: number, delta: number): void {
@@ -89,7 +93,14 @@ export class NarrativeSystem {
     this.typingTimer += delta;
 
     const currentLine = this.currentLogs[this.currentLogIndex];
-    if (!currentLine) return;
+    if (!currentLine) {
+      // Completed the entire act logs stack. Release scroll lock.
+      if (this.isCurrentlyTyping) {
+        this.isCurrentlyTyping = false;
+        EventBus.emit('NARRATIVE_TYPING_END');
+      }
+      return;
+    }
 
     if (this.charIndex < currentLine.length) {
       if (this.typingTimer >= this.charDelay) {
@@ -109,6 +120,12 @@ export class NarrativeSystem {
           this.currentText = '';
         } else {
           this.container.innerHTML = `&gt; ${currentLine}<span style="opacity: 0.4;">_</span>`;
+          
+          // Released lock at the end of last line
+          if (this.isCurrentlyTyping) {
+            this.isCurrentlyTyping = false;
+            EventBus.emit('NARRATIVE_TYPING_END');
+          }
         }
       }
     }
