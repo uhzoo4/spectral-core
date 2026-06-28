@@ -17,9 +17,9 @@ export const discoveryConfig: DiscoveryStateConfig[] = [
     signalOpacity: 0.0,
     threatOpacity: 0.0,
     telemetryLogs: [
-      'SYSTEM DORMANT. LEVEL 0 MONITOR ACTIVE.',
-      'READING ZERO STIMULI. DAMPING ALL CENTROIDS.',
-      'AWAITING INPUT SIGNATURES...'
+      'Dormant.',
+      'Listening.',
+      'Awaiting presence...'
     ]
   },
   {
@@ -30,9 +30,9 @@ export const discoveryConfig: DiscoveryStateConfig[] = [
     signalOpacity: 0.0,
     threatOpacity: 0.0,
     telemetryLogs: [
-      'INPUT STIMULI LOCATED. POINTER SIGNATURE INTERCEPTED.',
-      'BIAS VECTORS INITIATED TOWARDS COORDINATES.',
-      'MONITORING POINTER DWELL TIMERS.'
+      'Observer Linked.',
+      'Attention focused.',
+      'Presence detected.'
     ]
   },
   {
@@ -43,9 +43,9 @@ export const discoveryConfig: DiscoveryStateConfig[] = [
     signalOpacity: 0.6,
     threatOpacity: 0.0,
     telemetryLogs: [
-      'SUSTAINED INTERACTION CONFIRMED. AWAKENING ANCHORS.',
-      'PROPAGATING WAVEFRONT PULSES ACROSS NODES.',
-      'ESTABLISHING SHUNT ROUTINGS...'
+      'Signal Acquired.',
+      'Awakening network.',
+      'Flow initialized.'
     ]
   },
   {
@@ -56,9 +56,9 @@ export const discoveryConfig: DiscoveryStateConfig[] = [
     signalOpacity: 1.0,
     threatOpacity: 0.7,
     telemetryLogs: [
-      'CRITICAL WARN: FOREIGN VECTOR IDENTIFIED.',
-      'SPAWNING COMPRESSION GLITCH ANOMALIES.',
-      'ISOLATING THREAT COORDINATES.'
+      'Integrity compromised.',
+      'Isolating anomalous vector.',
+      'Restrained tension.'
     ]
   },
   {
@@ -69,9 +69,9 @@ export const discoveryConfig: DiscoveryStateConfig[] = [
     signalOpacity: 1.0,
     threatOpacity: 1.0,
     telemetryLogs: [
-      'EXPOSING SYSTEM ARCHITECTURE SCHEMATICS.',
-      'LAYERS ACTIVATED: CLUSTER // SIGNAL // OBSERVER // THREAT.',
-      'TRANSLATING RAW VECTORS TO HIGH-FREQUENCY UNIFORMS.'
+      'Architecture Revealed.',
+      'Exposing connection vectors.',
+      'Symmetric harmony.'
     ]
   },
   {
@@ -82,9 +82,9 @@ export const discoveryConfig: DiscoveryStateConfig[] = [
     signalOpacity: 1.0,
     threatOpacity: 1.0,
     telemetryLogs: [
-      'NETWORK FULLY SYNCHRONIZED.',
-      'DYNAMIC EQUILIBRIUM ACHIEVED. FREESPAN LOAD COMPLETED.',
-      'SYSTEM AWARE. OBSERVATION LOOP NOMINAL.'
+      'Awareness Rising.',
+      'System fully synchronized.',
+      'Equilibrium achieved.'
     ]
   }
 ];

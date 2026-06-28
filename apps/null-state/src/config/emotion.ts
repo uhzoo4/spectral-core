@@ -23,9 +23,10 @@ export interface EmotionStateConfig {
 
 export const emotionConfig: EmotionStateConfig[] = [
   {
+    // State 0: Dormant
     label: 'Dormant',
-    primaryColor: { r: 0.25, g: 0.27, b: 0.28 }, // Graphite
-    glowColor: { r: 0.1, g: 0.11, b: 0.12 },
+    primaryColor: { r: 0.12, g: 0.13, b: 0.14 }, // Deep graphite
+    glowColor: { r: 0.04, g: 0.04, b: 0.05 },
     motionSpeed: 0.1,
     motionJitter: 0.01,
     cameraDriftScale: 0.15,
@@ -33,15 +34,16 @@ export const emotionConfig: EmotionStateConfig[] = [
     cameraZoom: 1.0,
     cameraParallax: 0.05,
     signalInterval: 8.0,
-    uiOpacity: 0.3,
+    uiOpacity: 0.35,
     letterSpacing: '4px',
     fontWeight: '300',
     transitionDuration: 2.0,
   },
   {
+    // State 1: Observer
     label: 'Observer',
-    primaryColor: { r: 0.0, g: 0.8, b: 0.6 }, // Jade
-    glowColor: { r: 0.0, g: 0.3, b: 0.2 },
+    primaryColor: { r: 0.0, g: 0.7, b: 0.45 }, // Jade
+    glowColor: { r: 0.0, g: 0.25, b: 0.15 },
     motionSpeed: 0.4,
     motionJitter: 0.05,
     cameraDriftScale: 0.3,
@@ -55,9 +57,10 @@ export const emotionConfig: EmotionStateConfig[] = [
     transitionDuration: 1.5,
   },
   {
+    // State 2: Awakening
     label: 'Awakening',
-    primaryColor: { r: 0.0, g: 1.0, b: 0.5 }, // Emerald
-    glowColor: { r: 0.0, g: 0.4, b: 0.15 },
+    primaryColor: { r: 0.0, g: 0.9, b: 0.35 }, // Emerald
+    glowColor: { r: 0.0, g: 0.35, b: 0.1 },
     motionSpeed: 0.8,
     motionJitter: 0.1,
     cameraDriftScale: 0.45,
@@ -71,15 +74,33 @@ export const emotionConfig: EmotionStateConfig[] = [
     transitionDuration: 1.2,
   },
   {
+    // State 3: Threat
     label: 'Threat',
-    primaryColor: { r: 1.0, g: 0.1, b: 0.2 }, // Crimson alert
-    glowColor: { r: 0.5, g: 0.0, b: 0.05 },
-    motionSpeed: 1.2,
-    motionJitter: 0.4, // Muscular trembling
-    cameraDriftScale: 0.8, // Muscle-tremor high freq drift
-    cameraDriftSpeed: 4.5,
+    primaryColor: { r: 0.9, g: 0.45, b: 0.0 }, // Amber
+    glowColor: { r: 0.4, g: 0.18, b: 0.0 },
+    motionSpeed: 1.1,
+    motionJitter: 0.25, // Confident, controlled tension jitter
+    cameraDriftScale: 0.6, // Restrained instability drift
+    cameraDriftSpeed: 3.0,
     cameraZoom: 0.95,
-    cameraParallax: 0.6,
+    cameraParallax: 0.5,
+    signalInterval: 1.2,
+    uiOpacity: 1.0,
+    letterSpacing: '1px',
+    fontWeight: '600',
+    transitionDuration: 1.0,
+  },
+  {
+    // State 4: Critical
+    label: 'Critical',
+    primaryColor: { r: 0.8, g: 0.05, b: 0.12 }, // Restrained Crimson
+    glowColor: { r: 0.35, g: 0.0, b: 0.03 },
+    motionSpeed: 1.3,
+    motionJitter: 0.45,
+    cameraDriftScale: 0.75,
+    cameraDriftSpeed: 4.2,
+    cameraZoom: 0.9,
+    cameraParallax: 0.65,
     signalInterval: 0.8,
     uiOpacity: 1.0,
     letterSpacing: '0px',
@@ -87,25 +108,10 @@ export const emotionConfig: EmotionStateConfig[] = [
     transitionDuration: 0.8,
   },
   {
-    label: 'Architecture',
-    primaryColor: { r: 0.2, g: 0.6, b: 1.0 }, // Technical blue
-    glowColor: { r: 0.05, g: 0.15, b: 0.4 },
-    motionSpeed: 0.7,
-    motionJitter: 0.0,
-    cameraDriftScale: 0.2,
-    cameraDriftSpeed: 0.3,
-    cameraZoom: 0.8, // Isometric macro reveal
-    cameraParallax: 0.15,
-    signalInterval: 4.0,
-    uiOpacity: 0.8,
-    letterSpacing: '3px',
-    fontWeight: '300',
-    transitionDuration: 1.8,
-  },
-  {
+    // State 5: Awareness
     label: 'Awareness',
-    primaryColor: { r: 0.95, g: 0.96, b: 0.97 }, // Clean white
-    glowColor: { r: 0.4, g: 0.41, b: 0.42 },
+    primaryColor: { r: 0.95, g: 0.95, b: 0.95 }, // Neutral White
+    glowColor: { r: 0.35, g: 0.35, b: 0.35 },
     motionSpeed: 0.5,
     motionJitter: 0.02,
     cameraDriftScale: 0.25,
