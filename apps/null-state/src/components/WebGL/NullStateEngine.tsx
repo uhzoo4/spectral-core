@@ -31,7 +31,9 @@ import {
   MagneticFieldSystem,
   FocusAttentionSystem,
   InteractionTimelineSystem,
-  NodeFieldSystem
+  NodeFieldSystem,
+  DepthHierarchySystem,
+  PresenceSystem
 } from '@cinematic-engine/systems';
 
 // 1. Controller component to handle high-frequency frame ticks inside the Canvas context
@@ -64,6 +66,7 @@ const SceneController = ({ instanceCount }: { instanceCount: number }) => {
     const magneticSystem = new MagneticFieldSystem();
     const focusAttentionSystem = new FocusAttentionSystem();
     const interactionTimelineSystem = new InteractionTimelineSystem();
+    const presenceSystem = new PresenceSystem();
     
     const nodeFieldSystem = new NodeFieldSystem(instanceCount);
     nodeFieldSystemRef.current = nodeFieldSystem;
@@ -86,6 +89,7 @@ const SceneController = ({ instanceCount }: { instanceCount: number }) => {
     engine.registerSystem(magneticSystem);
     engine.registerSystem(focusAttentionSystem);
     engine.registerSystem(interactionTimelineSystem);
+    engine.registerSystem(presenceSystem);
     engine.registerSystem(nodeFieldSystem);
 
     // Initial node configurations
@@ -93,18 +97,28 @@ const SceneController = ({ instanceCount }: { instanceCount: number }) => {
       const mesh = meshRef.current;
       mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
       
+      const depthSystem = new DepthHierarchySystem();
       const obj = new THREE.Object3D();
       for (let i = 0; i < instanceCount; i++) {
         const px = nodeFieldSystem.positions[i * 3 + 0];
         const py = nodeFieldSystem.positions[i * 3 + 1];
         const pz = nodeFieldSystem.positions[i * 3 + 2];
         
+        const adjustments = depthSystem.getDepthAdjustments(pz, 0.08 + Math.random() * 0.12);
+        
         obj.position.set(px, py, pz);
-        obj.scale.setScalar(0.08 + Math.random() * 0.12);
+        obj.scale.setScalar(adjustments.scale);
         obj.updateMatrix();
         mesh.setMatrixAt(i, obj.matrix);
 
-        tempColor.setRGB(0.0, 0.8 + Math.random() * 0.2, 0.6 + Math.random() * 0.4);
+        // Ambient depth-layered colors
+        if (pz <= -5.0) {
+          tempColor.setRGB(0.0, 0.15 + Math.random() * 0.1, 0.25 + Math.random() * 0.1);
+        } else if (pz >= 5.0) {
+          tempColor.setRGB(0.0, 0.95, 0.85);
+        } else {
+          tempColor.setRGB(0.0, 0.8 + Math.random() * 0.2, 0.6 + Math.random() * 0.4);
+        }
         mesh.setColorAt(i, tempColor);
       }
       mesh.instanceMatrix.needsUpdate = true;
@@ -156,6 +170,10 @@ const SceneController = ({ instanceCount }: { instanceCount: number }) => {
       }
       mesh.instanceMatrix.needsUpdate = true;
     }
+
+    // Bind three.js camera coordinates to cinematicState spring camera
+    state.camera.position.copy(cinematicState.cameraPosition);
+    state.camera.lookAt(cinematicState.focusPosition);
 
     // 3. Update shader material uniforms
     if (materialRef.current) {

@@ -9,6 +9,7 @@ export interface CinematicState {
   breathMultiplier: number; // 0.0 - 1.0 breathing wave
   focusPosition: Vector3;
   focusRadius: number;
+  cameraPosition: Vector3;
 
   // Visual lock status
   isNarrativeTyping: boolean;
@@ -22,6 +23,7 @@ export const cinematicState: CinematicState = {
   breathMultiplier: 1.0,
   focusPosition: new Vector3(0, 0, 0),
   focusRadius: 4.0,
+  cameraPosition: new Vector3(0, 0, 20),
 
   isNarrativeTyping: false,
 };

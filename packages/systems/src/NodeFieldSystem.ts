@@ -1,4 +1,5 @@
 import { networkState, emotionState, cinematicState, interactionState } from '@cinematic-engine/core';
+import { EnvironmentalCompositionSystem } from './EnvironmentalCompositionSystem';
 
 export interface NodeObject {
   x: number;
@@ -48,24 +49,23 @@ export class NodeFieldSystem {
   private initializeNodes(): void {
     const count = this.nodeCount;
     const clusterCounts = networkState.clusterCounts || 8;
+    const composition = new EnvironmentalCompositionSystem();
+    const tempPos = { x: 0, y: 0, z: 0 };
 
     for (let i = 0; i < count; i++) {
       const clusterIdx = i % clusterCounts;
       this.clusterIndices[i] = clusterIdx;
       
-      const clusterBase = networkState.clusterBases[clusterIdx];
+      composition.composeNode(i, count, tempPos);
+      const center = networkState.clusterCenters[clusterIdx];
 
-      const rx = (Math.random() - 0.5) * 8.0;
-      const ry = (Math.random() - 0.5) * 8.0;
-      const rz = (Math.random() - 0.5) * 3.0;
+      this.clusterOffsets[i * 3 + 0] = tempPos.x - center.x;
+      this.clusterOffsets[i * 3 + 1] = tempPos.y - center.y;
+      this.clusterOffsets[i * 3 + 2] = tempPos.z - center.z;
 
-      this.clusterOffsets[i * 3 + 0] = rx;
-      this.clusterOffsets[i * 3 + 1] = ry;
-      this.clusterOffsets[i * 3 + 2] = rz;
-
-      this.positions[i * 3 + 0] = clusterBase.x + rx;
-      this.positions[i * 3 + 1] = clusterBase.y + ry;
-      this.positions[i * 3 + 2] = clusterBase.z + rz;
+      this.positions[i * 3 + 0] = tempPos.x;
+      this.positions[i * 3 + 1] = tempPos.y;
+      this.positions[i * 3 + 2] = tempPos.z;
       
       const node = this.nodes[i];
       node.x = this.positions[i * 3 + 0];
